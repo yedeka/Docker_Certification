@@ -1,0 +1,22 @@
+Namespaces - 
+Groups that allow you to isolate process in terms of resources that the processes can see. 
+Namespaces prevent processess from interferring with each other.
+Docker uses namespaces to isolate containers so that contsiners can operate independently and securely. 
+
+Namespaces used - 
+pid - Used for process isolation. 
+net -  Used for containers network connections. 
+ipc - Used for interprocess communication. 
+mnt - used for filesystem mount points. 
+uts - kernal and version identifiers. Different containers running different kernals. 
+The above namespaces are used automatically by docker, we do not need to explicitely set these namespaces up. 
+
+Special namespace -  user allows a container processed to run as root inside the container mapping to an unpriviledged user on host. Very important for security 
+so that a compromised container does not comprise the entire host. 
+
+Control Groups (cgroups)
+Limits applications to a sepcific set of resources. Sounds simillar like namespaces but they are still different. 
+However namespaces limit a process transparently about resources to a process without the process being aware of even the existence of the process. However cgroups 
+are more about limiting resource usage. So namespaces limit what resource a process can see but control groups limit what resources a process can use. Hence control 
+groups pertain to specify enforcing limits on resources.
+

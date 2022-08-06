@@ -1,0 +1,45 @@
+Installing Docker on Ububtu 
+1] Update packages 
+sudo apt-get update
+
+2] Install reprequsite helper packages. -y allows us to say yes to all the prompts.
+sudo apt-get -y install  apt-transport-https ca-certificates curl gnupg-agent software-properties-common
+
+3] download the GPG key for the docker repo 
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+Command before | downloads the docker GPG key and command after | adds the GPG key. 
+GPG key is used to verify the docker repositories.  
+
+4] Command to add docker repository 
+sudo add-apt-repository \
+   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+   $(lsb_release -cs) \
+   stable"
+
+5] Refresh package list 
+sudo apt-get update
+
+6] Install docker packages i.e. docker-ce, docker-ce-cli and containerd.io
+
+7] Verify docker by checking the docker version. 
+sudo docker version 
+
+8] Give access to user cloud_user without sudo. This can be done by adding user cloud_user to the docker group. Unless this
+is done when docker version is run we only get the clinet information and the server information is not provided due to 
+no access exception. Hence we need to add the user cloud_user to docker group via below mentioned commands 
+sudo usermod -a -G docker cloud_user
+After usermod command is run in order for the command to take effect the server needs to be restarted. 
+run the docker version command after usermod and we can see the server version as well. 
+
+9] Set default logging driver to syslog. 
+In order to do this we need to edit a file /etc/docker/daemon.json 
+We need to do this as root. 
+sudo vi /etc/docker/daemon.json
+After the config change docker needs to be restarted for the change to take effect. This can be verified by running docker 
+info.
+Hence restart docker by running 
+sudo systemctl restart docker 
+Doing docker info after change allows us to see the change being reflected.
+
+ 
+  
