@@ -1,0 +1,59 @@
+Images must be as efficient as possible. 
+That means images should be as small as possible to produce ephemeral containers. That is the images that can be stated
+stopped and destroyed easily without damaging anything. 
+
+General tips 
+1] Put things less likely to change on lower layers. Since all the layers above a layer are built when a layer changes due 
+to the fact that the layers above a certain layer depend on it. 
+2] Avoid creating unnecessary layers. 
+3] Avoid including unnecessary files. Most important and most easy to follow.
+
+Efficient image building can be done by 
+Multi-stage builds. 
+Can be done with Dockerfiles haveing more than 1 FROM directive. 
+
+Lab details 
+1] mkdir efficient 
+2] mkdir inefficient
+
+Create an inefficient hello world program. 
+Step 1] Create a helloworld.go program. 
+Step 2] Dockerfile for running helloworld.go 
+
+FROM golang:1.12.14
+workdir /helloworld 
+COPY helloworld.go .
+RUN GOOS=linux go build -a -installsuffix cgo -o helloworld .
+CMD ["./helloworld"]
+
+Step 3] build the image with docker build -t inefficient .
+
+step 4] run the newly built iefficient image docker run inefficient
+
+Step 5] To check for currently running images run docker image ls. This prints image details with size of each image.
+If we look closely we can see that the size of the helloworld image is 820MB which is huge considering the work done is 
+only printing hello world. This happens because we need entire go pakcage to compile and run the executable. However once
+the executable is created we do not need golang. Hence this can be handled to reduce the image size. 
+
+To make the final image more efficient we create a multi stage build after the executable is generated as follows. 
+FROM golang:1.12.14 AS compiler 
+workdir /helloworld 
+COPY helloworld.go .
+RUN GOOS=linux go build -a -installsuffix cgo -o helloworld .
+
+FROM alpine 3.9.3
+WORKDIR /root
+COPY --from=compiler /helloworld/helloworld
+# Above command means copy the executable helloworld from working directory helloworld of the image named compiler. 
+CMD ["./helloworld"]
+
+Step 6] Build the efficient image 
+docker build -t efficient 
+docker run efficient
+
+
+
+  
+
+
+
