@@ -1,0 +1,13 @@
+1] EXPOSE - Documents the ports and intended to be publihsed while running. Does not publish ports or enable ports.
+
+2] WORKDIR - Sets current working directory for commands below WORKDIR. 
+Final WORKDIR in docker file determines the current working directory after container runs. 
+WORKDIR can be absolute starting with a forward slash "/" or it can be relative. 
+
+3] COPY - COPY copies the files from host to image. 
+
+4] ADD - Works simillar to copy but can pull files from an archive or a URL.
+
+5] STOPSIGNAL - Which signal is sent to the host when the container is stopped. 
+
+6] HEALTHCHECK - Allows to specify a command to check helath of the container. 
