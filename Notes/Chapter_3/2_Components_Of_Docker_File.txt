@@ -1,0 +1,48 @@
+Dockerfile - Set of instructions used to constrtuct a docker image. 
+The instructions are called directives. 
+
+Steps for building a dockerfile. Build a custom nginx image 
+1] Contruct a project directory to work from.  
+2] mkdir custom-nginx 
+   cd custom-nginx
+   vi index.html 
+   // Add sample content into index.html
+   // Now create Dockerfile. 
+   vi Dockerfile		
+3] Some important directives 
+   3.1] From - in most dockerfiles this is the first directive. 
+   Stars a new build stage and sets a base image. 
+   In order to form a completely blank base image we can have FROM scratch. 
+   
+   3.2] ENV - Sets environment variables when the container is back in action. 
+   environment variables can be referenced in the Dockerfile itself below where they are declared as well as they can be accessed by the application being run in the 
+   container. 
+
+   3.3] RUN - Creates a new layer on top of previous layer by running a command inside new layer and committing the changes.
+   
+   3.4] CMD - Specify a default command to be used while running the container at execution time. So the command specified in the CMD directive will be run when 
+	      user does not provide any command while running the image using docker run.
+
+   Contents of Dockerfile 
+   From ubuntu:bionic 
+  
+   ENV NGINX_VERSION 1.14.0-0ubuntu1.10
+
+   RUN apt-get update && apt-get install -y curl
+   RUN apt-get update && apt-get install -y nginx=$NGINX_VERSION
+   
+   CMD ["nginx", "-g", "daemon off;"]
+
+4] Building an image from a docker file 
+docker build -t custom-nginx . 
+# -t specifies the tag name of the image.
+# last argument specifies the directory to build from. A '.' indicates to build from current directory. This means docker searches for Dockerfile in the directory specified 
+by last argument and builds the image. 
+
+5] Test the image using 
+docker run custom-nginx
+
+no error messages on docker run indicate a successful run of the image.
+Another way of validation 
+docker run -d -p 8080:80 custom-nginx
+curl localhost:8080

@@ -1,0 +1,30 @@
+Docker image - Docker image is a file containing code and components needed to run software in a container. 
+Layered file system - Used for building the images. Images are made up of layers. 
+Each layer only contains the differences from previous layer. 
+Each layer is not a full copy. 
+
+For e.g. 
+a standard image for running a python web app might look like 
+1] Base image - ubuntu 
+2] Python - All files and executables needed for running python. 
+3] Web application - Python web app code files and web server environment. 
+
+THese 3 layers form an image but the only drawback is these layers are not writable meaning they can't be chnaged. Hence
+we run a container to create an additional writable layer on top of the image layers. 
+
+Why layered file system 
+Advantages - 
+1] Smaller overall storage footprint - FOr e.g. of we want to run 5 nginx containers on a machine then we would not need 
+5 images, we can just work with 1 image and 5 writable container layers. 
+We can not only share layers between containers but we can also share layers between images. 
+This sharing of layers between containers and images results in smaller overall storage footprint. 
+2] Faster image transfer - Due to less storage data. Proven by the fact that if an image is already there on a host second
+docker run does not end up downloading the image again. 
+3] Faster image build - Build only the changed layer and upper layers for building a new image. 
+
+Pulling an image from remote 
+1] docker image pull <Image_Name> for e.g. docker image pull nginx 
+2] docker image history <Image_Name> for e.g. docker image history nginx. List all the layers used for building the image.
+
+
+
