@@ -1,0 +1,22 @@
+Common commands for managing images on the system 
+1] docker image pull nginx:1.14.0 - Pulls image from docker hub if it does not exist on host. 
+synonymous to docker pull nginx:1.14.0
+
+2] docker image ls - Lists currently existing images. 
+docker image ls -a - Lists all of the images including intermediate images. 
+
+3] docker image inspect <Image_TAG> - Allows us to have a look at all the image metadata.
+We can use a go template to format only specific fields for the image metadata 
+i.e. docker image inspect <Image_TAG> --format {{.Architecture}} provides only Architecutre field of image metadata.
+
+4] Removing an image from host 
+docker image rm <TAG_NAME> for e.g. docker image rm nginx:1.14.0 
+docker rmi <TAG_NAME> docker rmi nginx:1.14.0
+
+5] If a container is running an image then it can not be deleted. However we can force remove an image even if a container is running with force tag -f
+docker image rm -f nginx:1.14.0
+If the iamge files are currently being used then -f will not delete the files but it will just delete the tag. i.e. It generates a dangling image which is not referred
+to by any tag or container. 
+
+6] To delete images that are not being referenced by any tags or containers we can use following command 
+docker image prune.
