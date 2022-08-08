@@ -1,0 +1,24 @@
+Docker does not officially support image flattening since that is against docker philisophy. However this can be done as follows 
+Step 1] Run a container from an image. 
+Step 2] Export the container into an archive using docker export. 
+Step 3] Import the archive as a new image using docker import. 
+
+Steps for doing this 
+1] Create a Dockerfile as follows 
+FROM alpine:3.9.3
+RUN echo "Hello, world!" > message.txt
+CMD cat message.txt
+
+2] build the image as 
+docker build -t nonflat .
+
+3] Now run a container from nonflat image 
+docker run -d --name flat_container nonflat
+
+4] Now export the running container 
+docker export flat_container > flat.tar
+
+5] Now import the tar as new image. This can be done by doing a cat on file and piping that data to docker import as follows 
+cat flat.tar | docker import - flat:latest
+The size of the image remains the same however we only get one layer in the resulting image
+Checking for the history of flat we get only one layer but the size remains the same. 
