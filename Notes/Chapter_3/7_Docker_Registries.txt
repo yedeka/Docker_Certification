@@ -1,0 +1,68 @@
+Docker registry - A central place for storing and distributing docker images. 
+default public docker registry - dockerHub 
+By default every image is downloaded from dockerhub. 
+
+Private docker registry is also possible 
+1] Free and open registry software provided by docker. 
+2] Docker enterprise registry paid version.
+
+To create a basic registry simply run a container using registry image and publish port 5000. 
+Command to run default registory 
+docker run -d -p 5000:5000 --restart=always --name registry registry:2
+
+Checking configuration of the registry image 
+docker logs registry 
+
+stop and remove the registry 
+docker container stop registry && docker container rm -v registry
+
+Now to override individual configuration for the registry what we need to do is to provide the individual configuration values as environment variables while running 
+the registry 
+docker run -d -p 5000:5000 --restart=always --name registry -e REGISTRY_LOG_LEVEL=debug registry:2 # This changes the log level from info to debug 
+we can validate the same using docker logs registry. 
+
+Creating a secure registry 
+
+Step 1] Generate password
+
+mkdir ~/registry
+cd ~/registry
+mkdir auth - we store the authentication files in auth directory. 
+
+We are using a simple authentication mechanism to generate a HT user file with out accounts located in the file. This can be done as follows
+docker run --entrypoint htpasswd registry:2 -Bbn testuser password > auth/htpasswd - Does not work due to the fact that registry is broken with it's latest version. 
+Hence use the below image instead.  
+docker run --entrypoint htpasswd httpd:2 -Bbn testuser password > auth/htpasswd
+
+Step 2] Generate certs 
+cd ~/registry
+mkdir certs
+use openssl for generating certs
+
+openssl req -newkey rsa:4096 -nodes -sha256 -keyout certs/domain.key -x509 -days 365 -out certs/domain.crt
+
+Upon running the this command we will be given a lot of prompts most of which cna be left blank except the common name prompt which we should populate with the 
+public host name. 
+CN = cbbd99b3ff1c.mylabserver.com
+
+After setting up self signed certs and authentication we can setup the secure registry by following commands 
+
+docker run -d -p 443:443 --restart=always --name registry \
+-v /home/cloud_user/registry/certs:/certs \
+-v /home/cloud_user/registry/auth:/auth \
+-e REGISTRY_HTTP_ADDR=0.0.0.0:443 \
+-e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt \
+-e REGISTRY_HTTP_TLS_KEY=/certs/domain.key \
+-e REGISTRY_AUTH=htpasswd \
+-e "REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm" \
+-e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd \
+registry:2
+
+
+-v /home/cloud_user/registry/certs:/certs \ - Mounts the certs directory from the host to the container at path /certs.
+-e REGISTRY_HTTP_ADDR=0.0.0.0:443 \ - Makes registry to listen to 443. 
+-e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt \ - We pass in tls certificate from the mounted path in the container. 
+
+How to test if above mentioend registry is working. This can be done by simply polling to localhost:443 as follows 
+curl -k https://localhost:443
+ 
